@@ -1,5 +1,5 @@
 import logging
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 
 import os
 import sys
@@ -7,7 +7,7 @@ import imp
 import base64
 
 import threading
-import SocketServer
+import socketserver
 
 import ssl
 import socket
@@ -193,7 +193,7 @@ class RawListener(object):
             self.server.shutdown()
             self.server.server_close()
 
-class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
+class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
 
     def handle(self):                
         # Hook to ensure that all `recv` calls transparently emit a hex dump
@@ -242,10 +242,10 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
             except socket.error as msg:
                 self.server.logger.error('Error: %s', msg.strerror or msg)
 
-            except Exception, e:
+            except Exception as e:
                 self.server.logger.error('Error: %s', e)
 
-class ThreadedUDPRequestHandler(SocketServer.BaseRequestHandler):
+class ThreadedUDPRequestHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
         (data,sock) = self.request
@@ -264,16 +264,16 @@ class ThreadedUDPRequestHandler(SocketServer.BaseRequestHandler):
             except socket.error as msg:
                 self.server.logger.error('Error: %s', msg.strerror or msg)
 
-            except Exception, e:
+            except Exception as e:
                 self.server.logger.error('Error: %s', e)
 
-class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
+class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     # Avoid [Errno 98] Address already in use due to TIME_WAIT status on TCP
     # sockets, for details see:
     # https://stackoverflow.com/questions/4465959/python-errno-98-address-already-in-use
     allow_reuse_address = True
 
-class ThreadedUDPServer(SocketServer.ThreadingMixIn, SocketServer.UDPServer):
+class ThreadedUDPServer(socketserver.ThreadingMixIn, socketserver.UDPServer):
     pass
 
 def hexdump_table(data, length=16):
@@ -292,7 +292,7 @@ def test(config):
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    print "\t[RawListener] Sending request:\n%s" % "HELO\n"
+    print("\t[RawListener] Sending request:\n%s" % "HELO\n")
     try:
         # Connect to server and send data
         sock.connect(('localhost', int(config.get('port', 23))))

@@ -18,7 +18,7 @@ import threading
 from collections import OrderedDict
 
 from optparse import OptionParser,OptionGroup
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 
 import platform
 
@@ -323,7 +323,7 @@ class IfaceIpInfo():
 
 def main():
 
-    print """
+    print("""
   ______      _  ________ _   _ ______ _______     _   _  _____
  |  ____/\   | |/ /  ____| \ | |  ____|__   __|   | \ | |/ ____|
  | |__ /  \  | ' /| |__  |  \| | |__     | |______|  \| | |  __
@@ -335,7 +335,7 @@ def main():
   _____________________________________________________________
                    Developed by FLARE Team
   _____________________________________________________________
-                                               """
+                                               """)
 
     # Parse command line arguments
     parser = OptionParser(usage = "fakenet.py [options]:")
