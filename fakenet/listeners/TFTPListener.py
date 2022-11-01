@@ -4,7 +4,7 @@ import os
 import sys
 
 import threading
-import SocketServer
+import socketserver
 
 import socket
 import struct
@@ -82,7 +82,7 @@ class TFTPListener(object):
         self.port = self.config.get('port', 69)
 
         self.logger.debug('Initialized with config:')
-        for key, value in config.iteritems():
+        for key, value in config.items():
             self.logger.debug('  %10s: %s', key, value)
 
         path = self.config.get('tftproot', 'defaultFiles')
@@ -113,7 +113,7 @@ class TFTPListener(object):
             self.server.shutdown()
             self.server.server_close()
 
-class ThreadedUDPRequestHandler(SocketServer.BaseRequestHandler):
+class ThreadedUDPRequestHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
 
@@ -159,7 +159,7 @@ class ThreadedUDPRequestHandler(SocketServer.BaseRequestHandler):
 
                 self.server.logger.error('Unknown opcode: %d', struct.unpack('!H', data[:2])[0])
 
-        except Exception, e:
+        except Exception as e:
             self.server.logger.error('Error: %s', e)
             raise e
 
@@ -233,7 +233,7 @@ class ThreadedUDPRequestHandler(SocketServer.BaseRequestHandler):
         filename, mode, _ = data[2:].split("\x00", 2)
         return (filename, mode)
 
-class ThreadedUDPServer(SocketServer.ThreadingMixIn, SocketServer.UDPServer):
+class ThreadedUDPServer(socketserver.ThreadingMixIn, socketserver.UDPServer):
     pass
 
 ###############################################################################

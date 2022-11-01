@@ -4,7 +4,7 @@ import sys
 import os
 
 import threading
-import SocketServer
+import socketserver
 
 import ssl
 import socket
@@ -53,7 +53,7 @@ class SMTPListener(object):
         self.logger.debug('Starting...')
 
         self.logger.debug('Initialized with config:')
-        for key, value in config.iteritems():
+        for key, value in config.items():
             self.logger.debug('  %10s: %s', key, value)
 
     def start(self):
@@ -90,7 +90,7 @@ class SMTPListener(object):
             self.server.shutdown()
             self.server.server_close()
 
-class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
+class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
 
@@ -149,10 +149,10 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
         except socket.error as msg:
             self.server.logger.error('Error: %s', msg.strerror or msg)
 
-        except Exception, e:
+        except Exception as e:
             self.server.logger.error('Error: %s', e)
 
-class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
+class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
 
 ###############################################################################

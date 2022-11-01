@@ -6,8 +6,7 @@ import os
 import sys
 
 import threading
-import SocketServer
-import BaseHTTPServer
+import socketserver
 
 import ssl
 import socket
@@ -18,8 +17,7 @@ import time
 
 import urllib
 
-from BaseHTTPServer import HTTPServer
-from SimpleHTTPServer import SimpleHTTPRequestHandler
+from http.server import SimpleHTTPRequestHandler, HTTPServer
 
 from . import *
 
@@ -43,7 +41,7 @@ K_CONTENT_ENCODING = 'Content-Encoding'
 # BITS Protocol header values
 V_ACK = 'Ack'
 
-class ThreadedHTTPServer(BaseHTTPServer.HTTPServer):
+class ThreadedHTTPServer(HTTPServer):
 
     def handle_error(self, request, client_address):
         exctype, value = sys.exc_info()[:2]
@@ -223,7 +221,7 @@ class SimpleBITSRequestHandler(SimpleHTTPRequestHandler):
             Sends server response w/ headers and status code
         """
         self.send_response(status_code)
-        for k, v in headers_dict.iteritems():
+        for k, v in headers_dict.items():
             self.send_header(k, v)
         self.end_headers()
 
@@ -278,7 +276,7 @@ class SimpleBITSRequestHandler(SimpleHTTPRequestHandler):
             crange, total_length = content_range.split("/")
             total_length = int(total_length)
             range_start, range_end = [int(num) for num in crange.split("-")]
-        except AttributeError, IndexError:
+        except AttributeError as IndexError:
             self.__send_response(status_code = HTTPStatus.BAD_REQUEST)
             return
 
@@ -470,7 +468,7 @@ class BITSListener(object):
         self.logger.info('Starting...')
 
         self.logger.debug('Initialized with config:')
-        for key, value in config.iteritems():
+        for key, value in config.items():
             self.logger.debug('  %10s: %s', key, value)
 
         self.bits_file_prefix = self.config.get('bitsfileprefix', 'bits')

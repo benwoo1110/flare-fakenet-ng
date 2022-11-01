@@ -4,7 +4,7 @@ import os
 import sys
 
 import threading
-import SocketServer
+import socketserver
 
 import ssl
 import socket
@@ -15,8 +15,6 @@ from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler, TLS_FTPHandler
 from pyftpdlib.filesystems import AbstractedFS
 from pyftpdlib.servers import ThreadedFTPServer
-
-import BannerFactory
 
 FAKEUSER = 'FAKEUSER'
 FAKEPWD  = 'FAKEPWD'
@@ -247,7 +245,7 @@ class FTPListener(object):
         self.logger.debug('Starting...')
 
         self.logger.debug('Initialized with config:')
-        for key, value in config.iteritems():
+        for key, value in config.items():
             self.logger.debug('  %10s: %s', key, value)
 
         # Initialize ftproot directory

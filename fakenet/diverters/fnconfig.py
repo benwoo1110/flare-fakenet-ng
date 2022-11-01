@@ -19,7 +19,7 @@ class Config(object):
             2.) Turn string lists into arrays for quicker access
             3.) Expand port range specifications
         """
-        self._dict = dict((k.lower(), v) for k, v in config_dict.iteritems())
+        self._dict = dict((k.lower(), v) for k, v in config_dict.items())
 
         for entry in portlists:
             portlist = self.getconfigval(entry)

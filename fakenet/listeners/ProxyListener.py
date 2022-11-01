@@ -1,16 +1,16 @@
 import socket
-import SocketServer
+import socketserver
 import threading
 import sys
 import glob
 import time
 import importlib
-import Queue
+import queue
 import select
 import logging
 import ssl
 from OpenSSL import SSL
-from ssl_utils import ssl_detector
+from .ssl_utils import ssl_detector
 from . import *
 import os
 
@@ -38,7 +38,7 @@ class ProxyListener(object):
         self.logger.debug('Starting...')
 
         self.logger.debug('Initialized with config:')
-        for key, value in config.iteritems():
+        for key, value in config.items():
             self.logger.debug('  %10s: %s', key, value)
 
     def start(self):
@@ -128,12 +128,12 @@ class ThreadedTCPClientSocket(threading.Thread):
                         self.sock.close()
                         exit(1)
         except Exception as e:
-            self.logger.debug('Listener socket exception %s' % e.message)
+            self.logger.debug('Listener socket exception %s' % e)
 
-class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
+class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     daemon_threads = True
 
-class ThreadedUDPServer(SocketServer.ThreadingMixIn, SocketServer.UDPServer):
+class ThreadedUDPServer(socketserver.ThreadingMixIn, socketserver.UDPServer):
     daemon_threads = True
 
 def get_top_listener(config, data, listeners, diverter, orig_src_ip,
@@ -157,16 +157,16 @@ def get_top_listener(config, data, listeners, diverter, orig_src_ip,
     
     return top_listener
 
-class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
+class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
 
     
     def handle(self):
 
         remote_sock = self.request
         # queue for data received from the listener
-        listener_q = Queue.Queue()
+        listener_q = queue.Queue()
         # queue for data received from remote
-        remote_q = Queue.Queue()
+        remote_q = queue.Queue()
         data = None
 
         ssl_remote_sock = None
@@ -195,7 +195,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
             self.server.logger.debug('%s', '-'*80,)
 
         except Exception as e:
-            self.server.logger.warning('recv() error: %s' % e.message)
+            self.server.logger.warning('recv() error: %s' % e)
 
         if data:
 
@@ -258,7 +258,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
                         else:
                             remote_sock.send(data)
 
-class ThreadedUDPRequestHandler(SocketServer.BaseRequestHandler):
+class ThreadedUDPRequestHandler(socketserver.BaseRequestHandler):
 
 
     def handle(self):
@@ -297,12 +297,13 @@ class ThreadedUDPRequestHandler(SocketServer.BaseRequestHandler):
             self.server.logger.debug('No packet data')
 
 def hexdump_table(data, length=16):
-
+    if isinstance(data, str):
+        data = data.encode('utf-8')
     hexdump_lines = []
     for i in range(0, len(data), 16):
         chunk = data[i:i+16]
-        hex_line   = ' '.join(["%02X" % ord(b) for b in chunk ] )
-        ascii_line = ''.join([b if ord(b) > 31 and ord(b) < 127 else '.' for b in chunk ] )
+        hex_line   = ' '.join(["%02X" % b for b in chunk ] )
+        ascii_line = ''.join([chr(b) if b > 31 and b < 127 else '.' for b in chunk ] )
         hexdump_lines.append("%04X: %-*s %s" % (i, length*3, hex_line, ascii_line ))
     return hexdump_lines
 

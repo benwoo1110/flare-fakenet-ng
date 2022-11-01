@@ -4,7 +4,7 @@ import sys
 import os
 
 import threading
-import SocketServer
+import socketserver
 
 import ssl
 import socket
@@ -61,7 +61,7 @@ class POPListener(object):
         self.logger.debug('Starting...')
 
         self.logger.debug('Initialized with config:')
-        for key, value in config.iteritems():
+        for key, value in config.items():
             self.logger.debug('  %10s: %s', key, value)
 
     def start(self):
@@ -99,7 +99,7 @@ class POPListener(object):
             self.server.shutdown()
             self.server.server_close()
 
-class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
+class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
 
@@ -136,7 +136,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
         except socket.error as msg:
             self.server.logger.error('Error: %s', msg.strerror or msg)
 
-        except Exception, e:
+        except Exception as e:
             self.server.logger.error('Error: %s', e)
 
     def pop_DEFAULT(self, cmd, params):
@@ -236,7 +236,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
         self.request.sendall("+OK FakeNet POP3 server signing off\r\n")
 
 
-class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
+class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
 
 ###############################################################################
@@ -254,8 +254,8 @@ def test(config):
     server.pass_('password')
 
     logger.info('Listing and retrieving messages.')
-    print server.list()
-    print server.retr(1)
+    print(server.list())
+    print(server.retr(1))
     server.quit()
 
 def main():

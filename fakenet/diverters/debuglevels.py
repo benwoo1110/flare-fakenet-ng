@@ -39,4 +39,4 @@ DLABELS = {
     DMISC: 'MISC',
 }
 
-DLABELS_INV = {v.upper(): k for k, v in DLABELS.iteritems()}
+DLABELS_INV = {v.upper(): k for k, v in DLABELS.items()}

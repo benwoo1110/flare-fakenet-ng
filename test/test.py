@@ -53,7 +53,7 @@ def execute_detached(execute_cmd, winders=False):
                                shell=shl,
                                close_fds = cfds,
                                preexec_fn = preexec).pid
-    except Exception, e:
+    except Exception as e:
         logger.info('Error: Failed to execute command: %s', execute_cmd)
         logger.info('       %s', e)
         return None
@@ -445,7 +445,7 @@ class FakeNetTester(object):
         logger.info('-' * 79)
 
         # Do each test
-        for desc, (callback, args, expected) in tests.iteritems():
+        for desc, (callback, args, expected) in tests.items():
             logger.debug('Testing: %s' % (desc))
             passed = self._tryTest(desc, callback, args, expected)
 

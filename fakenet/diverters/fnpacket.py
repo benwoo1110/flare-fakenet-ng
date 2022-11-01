@@ -1,7 +1,7 @@
 import dpkt
 import socket
 import logging
-import debuglevels
+from . import debuglevels
 
 
 class PacketCtx(object):
@@ -64,7 +64,7 @@ class PacketCtx(object):
         self.dkey = None
 
         # Parse as much as possible
-        self.ipver = ((ord(self._raw[0]) & 0xf0) >> 4)
+        self.ipver = ((self._raw[0] & 0xf0) >> 4)
         if self.ipver == 4:
             self._parseIpv4()
         elif self.ipver == 6:
@@ -151,7 +151,7 @@ class PacketCtx(object):
     def dst_ip(self, new_dstip):
         if self._is_ip:
             self._dst_ip = new_dstip
-            self._hdr.dst = socket.inet_aton(new_dstip)
+            self._hdr.dst = socket.inet_aton(new_dstip.decode("ascii"))
             self._mangled = True
 
     # sport

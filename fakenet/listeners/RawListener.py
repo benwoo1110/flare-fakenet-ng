@@ -107,7 +107,7 @@ class RawListener(object):
         self.logger.debug('Starting...')
 
         self.logger.debug('Initialized with config:')
-        for key, value in config.iteritems():
+        for key, value in config.items():
             self.logger.debug('  %10s: %s', key, value)
 
     def start(self):
@@ -277,12 +277,13 @@ class ThreadedUDPServer(socketserver.ThreadingMixIn, socketserver.UDPServer):
     pass
 
 def hexdump_table(data, length=16):
-
+    if isinstance(data, str):
+        data = data.encode('utf-8')
     hexdump_lines = []
     for i in range(0, len(data), 16):
         chunk = data[i:i+16]
-        hex_line   = ' '.join(["%02X" % ord(b) for b in chunk ] )
-        ascii_line = ''.join([b if ord(b) > 31 and ord(b) < 127 else '.' for b in chunk ] )
+        hex_line   = ' '.join(["%02X" % b for b in chunk ] )
+        ascii_line = ''.join([chr(b) if b > 31 and b < 127 else '.' for b in chunk ] )
         hexdump_lines.append("%04X: %-*s %s" % (i, length*3, hex_line, ascii_line ))
     return hexdump_lines
 

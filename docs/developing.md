@@ -38,7 +38,7 @@ a sample listener template:
             self.logger.info('Starting...')
 
             self.logger.debug('Initialized with config:')
-            for key, value in config.iteritems():
+            for key, value in config.items():
                 self.logger.debug('  %10s: %s', key, value)
 
         def start(self):

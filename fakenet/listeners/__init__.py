@@ -1,3 +1,4 @@
+from . import BannerFactory
 from . import ListenerBase
 from . import RawListener
 from . import HTTPListener
@@ -12,4 +13,4 @@ from . import ProxyListener
 
 import os
 
-__all__ = ['ListenerBase', 'RawListener', 'HTTPListener', 'DNSListener', 'SMTPListener', 'FTPListener', 'IRCListener', 'TFTPListener', 'POPListener', 'BITSListener', 'ProxyListener']
+__all__ = ['BannerFactory', 'ListenerBase', 'RawListener', 'HTTPListener', 'DNSListener', 'SMTPListener', 'FTPListener', 'IRCListener', 'TFTPListener', 'POPListener', 'BITSListener', 'ProxyListener']

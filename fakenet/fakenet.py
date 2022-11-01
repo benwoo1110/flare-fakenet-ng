@@ -27,7 +27,6 @@ from collections import namedtuple
 
 ###############################################################################
 # Listener services
-import listeners
 from listeners import *
 
 ###############################################################################

@@ -4,12 +4,10 @@ import sys
 import os
 
 import threading
-import SocketServer
+import socketserver
 
 import ssl
 import socket
-
-import BannerFactory
 
 from . import *
 
@@ -85,7 +83,7 @@ class IRCListener(object):
         self.logger.debug('Starting...')
 
         self.logger.debug('Initialized with config:')
-        for key, value in config.iteritems():
+        for key, value in config.items():
             self.logger.debug('  %10s: %s', key, value)
 
     def start(self):
@@ -112,7 +110,7 @@ class IRCListener(object):
         bannerfactory = BannerFactory.BannerFactory()
         return bannerfactory.genBanner(self.config, BANNERS)
 
-class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
+class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
 
@@ -150,7 +148,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
         except socket.error as msg:
             self.server.logger.error('Error: %s', msg.strerror or msg)
 
-        except Exception, e:
+        except Exception as e:
             self.server.logger.error('Error: %s', e)
 
     def irc_DEFAULT(self, cmd, params):
@@ -238,7 +236,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
     def irc_send_client_custom(self, nick, user, servername, message):
         self.request.sendall(":%s!%s@%s %s\r\n" % (nick, user, servername, message))
 
-class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
+class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     # Avoid [Errno 98] Address already in use due to TIME_WAIT status on TCP
     # sockets, for details see:
     # https://stackoverflow.com/questions/4465959/python-errno-98-address-already-in-use

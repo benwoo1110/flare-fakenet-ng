@@ -1,13 +1,13 @@
 import logging
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 
 import os
 import sys
 import imp
 
 import threading
-import SocketServer
-import BaseHTTPServer
+import socketserver
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 import ssl
 import socket
@@ -173,7 +173,7 @@ class HTTPListener(object):
         self.port = self.config.get('port', 80)
 
         self.logger.debug('Initialized with config:')
-        for key, value in config.iteritems():
+        for key, value in config.items():
             self.logger.debug('  %10s: %s', key, value)
 
         # Initialize webroot directory
@@ -245,16 +245,16 @@ class HTTPListener(object):
             self.server.server_close()
 
 
-class ThreadedHTTPServer(BaseHTTPServer.HTTPServer):
+class ThreadedHTTPServer(HTTPServer):
 
     def handle_error(self, request, client_address):
         exctype, value = sys.exc_info()[:2]
-        self.logger.error('Error: %s', value)
+        self.logger.error('BAD Error: %s', value)
 
-class ThreadedHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+class ThreadedHTTPRequestHandler(BaseHTTPRequestHandler):
 
     def __init__(self, *args):
-        BaseHTTPServer.BaseHTTPRequestHandler.__init__(self, *args)
+        BaseHTTPRequestHandler.__init__(self, *args)
         self.logger = self.server.logger
 
     def version_string(self):
@@ -262,7 +262,7 @@ class ThreadedHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def setup(self):
         self.request.settimeout(int(self.server.config.get('timeout', 10)))
-        BaseHTTPServer.BaseHTTPRequestHandler.setup(self)
+        BaseHTTPRequestHandler.setup(self)
 
     def doCustomResponse(self, meth, post_data=None):
         uri = self.path
@@ -328,8 +328,8 @@ class ThreadedHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 http_f = open(http_filename, 'wb')
 
                 if http_f:
-                    http_f.write(self.requestline + "\r\n")
-                    http_f.write(str(self.headers) + "\r\n")
+                    http_f.write(self.requestline + b"\r\n")
+                    http_f.write(self.headers + b"\r\n")
                     http_f.write(post_body)
 
                     http_f.close()
@@ -411,7 +411,7 @@ def test(config):
     print("\t[HTTPListener] Testing GET request.")
     print('-'*80)
     print(requests.get(url, verify=False, stream=True).text)
-    print('-'*80
+    print('-'*80)
 
     print("\t[HTTPListener] Testing POST request.")
     print('-'*80)

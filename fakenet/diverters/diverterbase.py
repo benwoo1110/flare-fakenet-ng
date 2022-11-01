@@ -10,7 +10,7 @@ import threading
 import subprocess
 from . import fnpacket
 from . import fnconfig
-from debuglevels import *
+from .debuglevels import *
 from collections import namedtuple
 from collections import OrderedDict
 
@@ -540,7 +540,7 @@ class DiverterBase(fnconfig.Config):
         stringlists = ['HostBlackList']
         self.configure(diverter_config, portlists, stringlists)
         self.listeners_config = dict((k.lower(), v)
-                                     for k, v in listeners_config.iteritems())
+                                     for k, v in listeners_config.items())
 
         # Local IP address
         self.external_ip = socket.gethostbyname(socket.gethostname())
@@ -773,7 +773,7 @@ class DiverterBase(fnconfig.Config):
 
         #######################################################################
         # Populate diverter ports and process filters from the configuration
-        for listener_name, listener_config in listeners_config.iteritems():
+        for listener_name, listener_config in listeners_config.items():
 
             if 'port' in listener_config:
 
@@ -936,7 +936,7 @@ class DiverterBase(fnconfig.Config):
         except KeyError as e:
             self.logger.error(('Failed to build ExecuteCmd for port %d due ' +
                               'to erroneous format key: %s') %
-                              (dport, e.message))
+                              (dport, e))
 
         return cmd
 
