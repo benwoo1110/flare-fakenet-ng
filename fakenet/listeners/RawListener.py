@@ -5,6 +5,7 @@ import os
 import sys
 import imp
 import base64
+import types
 
 import threading
 import socketserver
@@ -26,6 +27,29 @@ def qualify_file_path(filename, fallbackdir):
             raise RuntimeError('Cannot find %s' % (filename))
 
     return path
+
+
+class SocketWrapper():
+    def __init__(self, server, socket):
+        self.server = server
+        self.socket = socket
+
+    def __getattr__(self, name: str):
+        # this allows for transparent access to socket attributes
+        try:
+            return getattr(self.socket, name)
+        except AttributeError as e:
+            raise AttributeError(f"Neither `Socket` or `SocketWrapper` have attribute {name}")
+
+    def recv(self, bufsize, flags=0):
+        data = self.socket.recv(bufsize, flags)
+        if data:
+            self._do_hexdump(data)
+        return data
+
+    def _do_hexdump(self, data):
+        for line in hexdump_table(data):
+            self.server.logger.info(INDENT + line)
 
 
 class RawCustomResponse(object):
@@ -199,20 +223,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         # Hook to ensure that all `recv` calls transparently emit a hex dump
         # in the log output, even if they occur within a user-implemented
         # custom handler
-        def do_hexdump(data):
-            for line in hexdump_table(data):
-                self.server.logger.info(INDENT + line)
-
-        orig_recv = self.request.recv
-
-        def hook_recv(self, bufsize, flags=0):
-            data = orig_recv(bufsize, flags)
-            if data:
-                do_hexdump(data)
-            return data
-
-        bound_meth = hook_recv.__get__(self.request, self.request.__class__)
-        setattr(self.request, 'recv', bound_meth)
+        self.request = SocketWrapper(self.server, self.request)
 
         # Timeout connection to prevent hanging
         self.request.settimeout(int(self.server.config.get('timeout', 5)))

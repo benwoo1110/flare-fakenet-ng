@@ -27,6 +27,7 @@ from collections import namedtuple
 
 ###############################################################################
 # Listener services
+import listeners
 from listeners import *
 
 ###############################################################################
@@ -62,11 +63,11 @@ class Fakenet(object):
 
         if not config_filename:
 
-            config_filename = os.path.join(os.path.dirname(__file__), 'configs', 'default.ini')
+            config_filename = os.path.join('configs', 'default.ini')
 
         if not os.path.exists(config_filename):
 
-            config_filename = os.path.join(os.path.dirname(__file__), 'configs', config_filename)
+            config_filename = os.path.join('configs', config_filename)
 
             if not os.path.exists(config_filename):
 
