@@ -150,6 +150,9 @@ class PacketCtx(object):
     @dst_ip.setter
     def dst_ip(self, new_dstip):
         if self._is_ip:
+            if hasattr(new_dstip, 'decode'):
+                new_dstip = new_dstip.decode('ascii')
+
             self._dst_ip = new_dstip
             self._hdr.dst = socket.inet_aton(new_dstip)
             self._mangled = True

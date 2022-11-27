@@ -55,7 +55,6 @@ class WindowsPacketCtx(fnpacket.PacketCtx):
 
     @dst_ip.setter
     def dst_ip(self, new_dstip):
-        new_dstip = new_dstip.decode('ascii')
         super(self.__class__, self.__class__).dst_ip.fset(self, new_dstip)
         self.wdpkt.dst_addr = new_dstip
 
