@@ -45,6 +45,23 @@ def qualify_file_path(filename, fallbackdir):
     return path
 
 
+class StreamWrapper():
+    def __init__(self, stream):
+        self.stream = stream
+
+    def __getattr__(self, name: str):
+        # this allows for transparent access to BinaryIO attributes
+        try:
+            return getattr(self.stream, name)
+        except AttributeError as e:
+            raise AttributeError(f"Neither `BinaryIO` or `StreamWrapper` have attribute {name}")
+
+    def write(self, data):
+        if hasattr(data, 'encode'):
+            data = data.encode('ascii')
+        self.stream.write(data)
+
+
 class CustomResponse(object):
     def __init__(self, name, conf, configroot):
         self.name = name
@@ -120,7 +137,7 @@ class CustomResponse(object):
     def respond(self, req, meth, postdata=None):
         current_time = req.date_time_string()
         if self.raw_file:
-            up_to_date = self.raw_file.replace('<RAW-DATE>', current_time)
+            up_to_date = self.raw_file.replace(b'<RAW-DATE>', current_time.encode('ascii'))
             req.wfile.write(up_to_date)
         elif self.handler:
             self.handler(req, meth, postdata)
@@ -198,12 +215,12 @@ class HTTPListener(object):
             keyfile_path = 'listeners/ssl_utils/privkey.pem'
             keyfile_path = ListenerBase.abs_config_path(keyfile_path)
             if keyfile_path is None:
-                raise RuntimeError('Could not locate %s' % (keyfile_path))
+                raise RuntimeError('Could not locate ssl private key at: %s' % (keyfile_path))
 
             certfile_path = 'listeners/ssl_utils/server.pem'
             certfile_path = ListenerBase.abs_config_path(certfile_path)
             if certfile_path is None:
-                raise RuntimeError('Could not locate %s' % (certfile_path))
+                raise RuntimeError('Could not locate ssl cert at: %s' % (certfile_path))
 
             self.server.socket = ssl.wrap_socket(self.server.socket, keyfile=keyfile_path, certfile=certfile_path, server_side=True, ciphers='RSA')
 
@@ -248,8 +265,8 @@ class HTTPListener(object):
 class ThreadedHTTPServer(HTTPServer):
 
     def handle_error(self, request, client_address):
-        exctype, value = sys.exc_info()[:2]
-        self.logger.error('BAD Error: %s', value)
+        self.logger.error('Unexpected error occurred!', exc_info=sys.exc_info())
+
 
 class ThreadedHTTPRequestHandler(BaseHTTPRequestHandler):
 
@@ -263,6 +280,7 @@ class ThreadedHTTPRequestHandler(BaseHTTPRequestHandler):
     def setup(self):
         self.request.settimeout(int(self.server.config.get('timeout', 10)))
         BaseHTTPRequestHandler.setup(self)
+        self.wfile = StreamWrapper(self.wfile)
 
     def doCustomResponse(self, meth, post_data=None):
         uri = self.path

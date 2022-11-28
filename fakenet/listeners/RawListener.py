@@ -47,6 +47,24 @@ class SocketWrapper():
             self._do_hexdump(data)
         return data
 
+    def send(self, data, flags=0):
+        if hasattr(data, 'encode'):
+            data = data.encode('ascii')
+        self._do_hexdump(data)
+        self.socket.send(data, flags)
+    
+    def sendall(self, data, flags=0):
+        if hasattr(data, 'encode'):
+            data = data.encode('ascii')
+        self._do_hexdump(data)
+        self.socket.sendall(data, flags)
+
+    def sendto(self, data, addr, flags=0):
+        if hasattr(data, 'encode'):
+            data = data.encode('ascii')
+        self._do_hexdump(data)
+        self.socket.sendto(data, addr, flags)
+
     def _do_hexdump(self, data):
         for line in hexdump_table(data):
             self.server.logger.info(INDENT + line)
