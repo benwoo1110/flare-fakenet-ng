@@ -1172,6 +1172,9 @@ class DiverterBase(fnconfig.Config):
 
             # fnpacket has parsed all that can be parsed, so
             pid, comm = self.get_pid_comm(pkt)
+            if hasattr(comm, 'decode'):
+                comm = comm.decode('ascii')
+
             if self.pdebug_level & DGENPKTV:
                 logline = self.formatPkt(pkt, pid, comm)
                 self.pdebug(DGENPKTV, logline)
@@ -1239,6 +1242,10 @@ class DiverterBase(fnconfig.Config):
             A str containing the log line
         """
         logline = ''
+        if pid is None:
+            pid  = ''
+        if comm is None:
+            comm  = ''
 
         if pkt.proto == 'UDP':
             fmt = '| {label} {proto} | {pid:>6} | {comm:<8} | {src:>15}:{sport:<5} | {dst:>15}:{dport:<5} | {length:>5} | {flags:<11} | {seqack:<35} |'
