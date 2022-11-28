@@ -17,7 +17,7 @@ import threading
 
 from collections import OrderedDict
 
-from optparse import OptionParser,OptionGroup
+from optparse import OptionParser, OptionGroup
 from configparser import ConfigParser
 
 import platform
@@ -28,7 +28,6 @@ from collections import namedtuple
 ###############################################################################
 # Listener services
 import listeners
-from listeners import *
 
 ###############################################################################
 # FakeNet
@@ -60,19 +59,14 @@ class Fakenet(object):
         self.running_listener_providers = list()
 
     def parse_config(self, config_filename):
-
         if not config_filename:
-
             config_filename = os.path.join('configs', 'default.ini')
 
-        if not os.path.exists(config_filename):
-
+        elif not os.path.exists(config_filename):
             config_filename = os.path.join('configs', config_filename)
 
             if not os.path.exists(config_filename):
-
-                self.logger.critical('Could not open configuration file %s',
-                                     config_filename)
+                self.logger.critical('Could not open configuration file %s', config_filename)
                 sys.exit(1)
 
         self.fakenet_config_dir = os.path.dirname(config_filename)
