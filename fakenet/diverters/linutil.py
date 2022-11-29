@@ -8,7 +8,7 @@ import binascii
 import threading
 import subprocess
 import netfilterqueue
-from debuglevels import *
+from .debuglevels import *
 from collections import defaultdict
 from . import diverterbase
 
@@ -294,14 +294,14 @@ class LinUtilMixin(diverterbase.DiverterPerOSDelegate):
         return False
 
     def linux_capture_iptables(self):
-        self.iptables_captured = ''
+        self.iptables_captured = b''
         ret = None
 
         try:
             p = subprocess.Popen(['iptables-save'], stdout=subprocess.PIPE)
             while True:
                 buf = p.stdout.read()
-                if buf == '':
+                if buf == b'':
                     break
                 self.iptables_captured += buf
 
@@ -397,7 +397,7 @@ class LinUtilMixin(diverterbase.DiverterPerOSDelegate):
         existing_queues = self.linux_get_current_nfnlq_bindings()
 
         next_qnos = list()
-        for qno in xrange(QNO_MAX + 1):
+        for qno in range(QNO_MAX + 1):
             if qno not in existing_queues:
                 next_qnos.append(qno)
                 if len(next_qnos) == n:
